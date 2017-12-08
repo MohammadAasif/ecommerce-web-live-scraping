@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script>
+
+    $( document ).ready(function() {
+
+      $.ajax({
+            type : "POST",
+            url : "/getreviews",
+            data: {} ,//JSON.stringify(data, null, '\t'),
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(result) {
+                console.log("Ahoy");
+                console.log(result);
+
+                reviews = result['data'];
+                overall = result['overall']
+                percent = result['percent']
+
+                for(rev in reviews){
+                  var item = reviews[rev];
+                  console.log(item)
+                  $('#revtable').append("<tr><td><h2>"+item['review']+"</h2></td></tr>")
+                  $('#revtable').append("<tr><td><h4 align='right'>"+item['sentiment']+"</h4></td></tr>")
+                }
+
+                document.getElementById('SENTI').innerHTML = "The product is "+parseInt(percent) + "% "+ overall+".";
+}
+});
+
+    });
+     </script>
+</head>
+
+<body>
+    <h1 align="center">Reviews</h1>
+    <br /><br />
+
+    <h2 id="SENTI" align="center">...</h2>
+
+<table border="1" id="revtable">
+</table>
+</body
+
+</html>

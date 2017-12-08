@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+    <script src="https://www.gstatic.com/firebasejs/3.7.2/firebase.js"></script>
+
+    <script>
+
+
+    globalAmazon = {}
+    globalFlipkart = {}
+    globalSnapdeal = {}
+
+        var config = {
+            apiKey: "AIzaSyDtBm6_TmofFu2J6J4B30G0hjHVfl89PYs",
+            authDomain: "senti-a92bc.firebaseapp.com",
+            databaseURL: "https://senti-a92bc.firebaseio.com",
+            storageBucket: "senti-a92bc.appspot.com",
+            messagingSenderId: "521412354345"
+        };
+
+        firebase.initializeApp(config);
+
+
+        firebase.database().ref('status/').on('value', function(snapshot) {
+            //console.log(snapshot.val());
+            document.getElementById('status').innerHTML = "Status : " + snapshot.val();
+        });
+
+
+        $(function() {
+            $('#searchButton').click(function() {
+
+                var searchKey = $('textarea[name="searchInput"]').val();
+
+                console.log("Search Key: " + searchKey);
+
+                data = {
+                    "key": "" + searchKey
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/search",
+                    data: JSON.stringify(data, null, '\t'),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function(result) {
+
+                        console.log("Search Result: ");
+                        console.log(result);
+
+
+                        amazon = result.amazon
+                        flipkart = result.flipkart
+                        snapdeal = result.snapdeal
+
+                        globalAmazon =amazon;
+                        globalFlipkart = flipkart;
+                        globalSnapdeal = snapdeal;
+
+                        amazonLI = []
+                        flipkartLI = []
+                        snapdealLI = []
+                        for (i = 0; i < Object.keys(amazon).length; i++) {
+                            item = amazon['' + i];
+                            var imgerr = "http://vignette2.wikia.nocookie.net/main-cast/images/5/5b/Sorry-image-not-available.png/revision/latest?cb=20160625173435";
+                            var PICCER = imgerr.toString();
+                            if( item['pic'] != null){
+                                PICCER = item['pic'].toString()
+                            }
+                            amazonLI.push('<li id="' + 'amazon' + i + '"><hr /> </h2><img src="' + PICCER+ '" width="250" height="250"><h2>' + item['name'] + '</h2>      <hr /> <h3>Cost:'+item['cost']+'</h3>  <hr />   </li>');
+
+                        }
+                        $('#searchlistAmazon').append(amazonLI.join(''));
+
+
+                        for (i = 0; i < Object.keys(flipkart).length; i++) {
+                            item = flipkart['' + i];
+                            var imgerr = "http://vignette2.wikia.nocookie.net/main-cast/images/5/5b/Sorry-image-not-available.png/revision/latest?cb=20160625173435";
+                            var PICCER = imgerr.toString();
+                            if( item['pic'] != null){
+                                PICCER = item['pic'].toString()
+                            }
+                            flipkartLI.push('<li><hr /> </h2><img src="'+PICCER+'" width="250" height="250"><h2>' + item['name'] + '</h2>     <hr /> <h3>Cost:'+item['cost']+'</h3>  <hr /> ');
+                        }
+                        $('#searchlistFlipkart').append(flipkartLI.join(''));
+
+
+                        for (i = 0; i < Object.keys(snapdeal).length; i++) {
+                            item = snapdeal['' + i];
+
+                            var imgerr = "http://vignette2.wikia.nocookie.net/main-cast/images/5/5b/Sorry-image-not-available.png/revision/latest?cb=20160625173435";
+                            var PICCER = imgerr.toString();
+                            if( item['pic'] != null){
+                                PICCER = item['pic'].toString()
+                            }
+
+                            snapdealLI.push('<li><hr /> </h2><img src="' + PICCER + '" width="250" height="250"><h2>' + item['name'] + '</h2>     <hr /> <h3>Cost:'+item['cost']+'</h3>  <hr /> </li>');
+
+                        }
+                        $('#searchlistSnapdeal').append(snapdealLI.join(''));
+
+
+                        firebase.database().ref('/').set({
+                            status: "Ready to Search"
+                        });
+
+
+                        console.log("READY SHIT WORKING")
+                        $('ul#searchlistAmazon li').click(function() {
+                            //var str = $(this).val();
+                            //alert($(this).index());
+                            //alert($('amazon' + $(this).index()).val());
+                            //amaID = $('amazon' + $(this).index()).val();
+
+                            //document.getElementById('amazon' + amaID).style.backgroundColor = 'red';
+                            //alert(document.getElementById('amazon' + amaID).style.backgroundColor);
+
+                            //$('amazonselectimage').attr('src',""+amazon[$(this).index()].pic);
+                            amazonINDEX = $(this).index();
+                            document.getElementById("amazonselectimage").src = "" + amazon[$(this).index()].pic;
+                            document.getElementById("amazonselecttext").innerHTML = "" + amazon[$(this).index()].name;
+
+
+                            //alert(""+amazon[$(this).index()].pic);
+                            //INDEX = $(this).index();
+
+
+                        });
+
+
+
+                        //alert(document.getElementById("searchlistFlipkart").innerHTML)
+                        $('ul#searchlistFlipkart li').click(function() {
+
+                            console.log("FLip shit working");
+
+                            flipkartINDEX = $(this).index();
+                            alert($(this).index());
+                            alert(flipkart[$(this).index()].pic);
+
+                            document.getElementById("flipkartselectimage").src = "" + flipkart[$(this).index()].pic;
+                            document.getElementById("flipkartselecttext").innerHTML = "" + flipkart[$(this).index()].name;
+
+
+                            //alert(""+amazon[$(this).index()].pic);
+                            //INDEX = $(this).index();
+
+
+                        });
+
+
+                        $('ul#searchlistSnapdeal li').click(function() {
+
+                            snapdealINDEX = $(this).index();
+                            document.getElementById("snapdealselectimage").src = "" + snapdeal[$(this).index()].pic;
+                            document.getElementById("snapdealselecttext").innerHTML = "" + snapdeal[$(this).index()].name;
+
+
+
+                        });
+
+
+
+                        return;
+
+                    },
+                    error: function(err) {
+                        console.log("Search Error: ");
+                        console.log(JSON.stringify(err));
+                    }
+                });
+
+            });
+        });
+
+
+        function enterCheck(e) {
+            e = e || event;
+            if (e.keyCode === 13 || e.keyCode == 10) {
+                // start your submit function
+
+                e.preventDefault();
+                $("#searchButton").trigger("click");
+
+            }
+            return false;
+        }
+
+
+
+
+        $(function() {
+                    $('#sentiButton').click(function() {
+
+                          /**
+                          amazonINDEX = 1;
+
+                          if(typeof amazonINDEX != 'undefined'){
+                          }
+                          A = {
+                          "asin" : globalAmazon[amazonINDEX].asin
+                        };
+                          else{
+                            A = {
+                              "asin" : "XXX"
+                            }
+                          }
+                          **/
+
+                          if(typeof amazonINDEX != 'undefined'){
+                          A = {
+
+                            "asin" : globalAmazon[amazonINDEX].asin
+                          };
+                          }
+
+                          if(typeof flipkartINDEX != 'undefined'){
+
+                          F = {
+                            "href": globalFlipkart[flipkartINDEX].href
+                          };
+                        }
+
+                        if(typeof snapdealINDEX != 'undefined'){
+
+                           S={
+                             "href": globalSnapdeal[snapdealINDEX].href
+                           }
+                         }
+
+                            packet = {
+                                "amazon": (typeof A != 'undefined')?A:"",
+                                "flipkart": (typeof F != 'undefined')?F:"",
+                                "snapdeal": (typeof S != 'undefined')?S:"",
+                            };
+
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/senti",
+                                data: JSON.stringify(packet, null, '\t'),
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                success: function(result) {
+                                    console.log(result);
+
+                                      alert("CameBack");
+                                    alert(result);
+
+
+                                    document.location ="/revpage"
+
+
+                                },
+                                error: function(err) {
+                                    console.log("Search Error: ");
+                                    console.log(JSON.stringify(err));
+                                }
+                            });
+
+                          });
+                        });
+
+    </script>
+</head>
+
+<body>
+
+
+    <br />
+    <h1 align="center">Sentimental Analysis on Ecommerce products</h1>
+    <br />
+
+    <table style="width:100%;  margin:50px;">
+        <tr style=" margin:10px;">
+            <td width="70%">
+                <textarea onkeyup="enterCheck(event);" style="resize:none; font-size:20px;" name="searchInput" cols="90" rows="1" maxR placeholder="Search for a product"></textarea>
+            </td>
+            <td width="30%">
+                <button type="button" class="btn btn-primary btn-lg" id="searchButton">Search</button>
+            </td>
+        </tr>
+    </table>
+
+    <hr />
+    <h1 align="center" id="status">...</h1>
+    <hr />
+    <br>
+
+    <!--
+<h1 align="center">Search Results</h1>
+-->
+    <div width="100%">
+
+
+        <div style="overflow: hidden; height:auto; background:#b0e0e6; margin:5px">
+            <div style="float: left;">
+                <div style="width:300px;">
+                    <h3>Amazon Selected Product :</h3>
+                </div>
+
+            </div>
+            <div style="float:left;">
+                <img id="amazonselectimage" width="100px" height="auto" />
+            </div>
+            <div style="float:left;">
+                <h3 id="amazonselecttext">Nothing Yet</h3>
+            </div>
+        </div>
+
+
+
+
+        <div style="overflow: hidden; height:auto; background:#b0e0e6; margin:5px">
+            <div style="float: left;">
+                <div style="width:300px;">
+                    <h3>Flipkart Selected Product :</h3>
+                </div>
+
+            </div>
+            <div style="float:left;">
+                <img id="flipkartselectimage" width="100px" height="auto" />
+            </div>
+            <div style="float:left;">
+                <h3 id="flipkartselecttext">Nothing Yet</h3>
+            </div>
+
+        </div>
+
+
+
+        <div style="overflow: hidden; height:auto; background:#b0e0e6; margin:5px">
+            <div style="float: left;">
+                <div style="width:300px;">
+                    <h3>Snapdeal Selected Product :</h3>
+                </div>
+
+            </div>
+            <div style="float:left;">
+                <img id="snapdealselectimage" width="100px" height="auto" />
+            </div>
+            <div style="float:left;">
+                <h3 id="snapdealselecttext">Nothing Yet</h3>
+            </div>
+        </div>
+
+
+                    <div style="float:right;">
+                        <button type="button" class="btn btn-primary btn-lg" id="sentiButton">Analyze</button>
+                    </div>
+    </div>
+
+
+
+    <div width="100%" style="height:100%; width:100%; overflow: hidden;">
+        <div style="float: left; width:33%; ">
+            <hr />
+            <h1>Amazon</h1>
+            <hr />
+            <ul id="searchlistAmazon" style="list-style-type: none;">
+            </ul>
+        </div>
+
+        <div style="float: left; width:33%; ">
+            <hr />
+            <h1>Flipkart</h1>
+            <hr />
+            <ul id="searchlistFlipkart" style="list-style-type: none;">
+            </ul>
+        </div>
+        <div style="float: left; width:33%; ">
+            <hr />
+            <h1>Snapdeal</h1>
+            <hr />
+            <ul id="searchlistSnapdeal" style="list-style-type: none;">
+            </ul>
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
